@@ -1,12 +1,279 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import Icon from '@/components/ui/icon';
 
 const Index = () => {
+  const [activeSection, setActiveSection] = useState('home');
+
+  const routes = [
+    { id: 1, name: 'Алтай - Чуйский тракт', difficulty: 'Экстрим', lat: 50.4, lng: 86.9, description: 'Легендарный маршрут с невероятными видами' },
+    { id: 2, name: 'Кавказ - Эльбрус', difficulty: 'Хардкор', lat: 43.3, lng: 42.4, description: 'Покорение высочайших троп' },
+    { id: 3, name: 'Карелия - Вуоксинские пороги', difficulty: 'Средний', lat: 61.1, lng: 30.2, description: 'Водные преграды и лесные дебри' },
+    { id: 4, name: 'Урал - Таганай', difficulty: 'Экстрим', lat: 55.3, lng: 59.8, description: 'Каменные реки и суровая природа' },
+  ];
+
+  const services = [
+    { icon: 'Truck', title: 'Прокат внедорожников', description: 'Подготовленные 4x4 автомобили с лебёдками и тюнингом' },
+    { icon: 'Map', title: 'Гид по маршрутам', description: 'Опытные инструкторы знают каждый камень' },
+    { icon: 'Wrench', title: 'Техническая поддержка', description: 'Ремонт и обслуживание в полевых условиях' },
+    { icon: 'Users', title: 'Групповые экспедиции', description: 'Сообщество единомышленников для совместных поездок' },
+  ];
+
+  const gallery = [
+    { 
+      image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/75cb4627-a062-4329-94b5-79b2366e1dce.jpg',
+      title: 'Пустынные дюны'
+    },
+    { 
+      image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/b24202f7-193a-48e8-922d-ebb56d4b7e1b.jpg',
+      title: 'Грязевые ванны'
+    },
+    { 
+      image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/6f0d8afd-df57-41a8-97e6-8421a76616b2.jpg',
+      title: 'Горные тропы'
+    },
+  ];
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSection(sectionId);
+    const element = document.getElementById(sectionId);
+    element?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 color-black text-black">Добро пожаловать!</h1>
-        <p className="text-xl text-gray-600">тут будет отображаться ваш проект</p>
-      </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon name="Mountain" size={32} className="text-primary" />
+            <span className="text-2xl font-bold">OFFROAD</span>
+          </div>
+          <div className="hidden md:flex gap-6">
+            {['home', 'routes', 'services', 'gallery', 'community', 'contacts'].map((section) => (
+              <button
+                key={section}
+                onClick={() => scrollToSection(section)}
+                className={`text-sm uppercase tracking-wider hover:text-primary transition-colors ${
+                  activeSection === section ? 'text-primary' : 'text-foreground/70'
+                }`}
+              >
+                {section === 'home' && 'Главная'}
+                {section === 'routes' && 'Маршруты'}
+                {section === 'services' && 'Услуги'}
+                {section === 'gallery' && 'Галерея'}
+                {section === 'community' && 'Сообщество'}
+                {section === 'contacts' && 'Контакты'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20"></div>
+        <div className="container mx-auto px-4 z-10 text-center animate-fade-in">
+          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-primary drop-shadow-2xl">
+            ПОКОРЯЙ БЕЗДОРОЖЬЕ
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 text-foreground/90 max-w-2xl mx-auto">
+            Экстремальные маршруты, адреналин и свобода. Присоединяйся к сообществу настоящих оффроудеров!
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="text-lg px-8 hover:scale-105 transition-transform"
+              onClick={() => scrollToSection('routes')}
+            >
+              <Icon name="Map" size={20} className="mr-2" />
+              Маршруты
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg px-8 hover:scale-105 transition-transform"
+              onClick={() => scrollToSection('community')}
+            >
+              <Icon name="Users" size={20} className="mr-2" />
+              Присоединиться
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section id="routes" className="py-20 bg-card">
+        <div className="container mx-auto px-4">
+          <h2 className="text-5xl font-bold text-center mb-4 text-primary animate-fade-in">
+            ПОПУЛЯРНЫЕ МАРШРУТЫ
+          </h2>
+          <p className="text-center text-muted-foreground mb-12 text-lg">
+            Интерактивная карта с проверенными местами для экстремальных поездок
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {routes.map((route, index) => (
+              <Card 
+                key={route.id} 
+                className="bg-background border-border hover:border-primary transition-all cursor-pointer hover:scale-105 animate-scale-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-2xl font-bold text-foreground">{route.name}</h3>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      route.difficulty === 'Хардкор' ? 'bg-destructive text-destructive-foreground' :
+                      route.difficulty === 'Экстрим' ? 'bg-primary text-primary-foreground' :
+                      'bg-secondary text-secondary-foreground'
+                    }`}>
+                      {route.difficulty}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground mb-4">{route.description}</p>
+                  <div className="flex items-center gap-2 text-sm text-primary">
+                    <Icon name="MapPin" size={16} />
+                    <span>Координаты: {route.lat}°N, {route.lng}°E</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="bg-muted rounded-lg p-8 text-center">
+            <Icon name="Map" size={64} className="mx-auto mb-4 text-primary" />
+            <h3 className="text-2xl font-bold mb-2">Интерактивная карта</h3>
+            <p className="text-muted-foreground">
+              Здесь будет полноценная карта с маршрутами и точками интереса
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="services" className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-5xl font-bold text-center mb-4 text-secondary animate-fade-in">
+            НАШИ УСЛУГИ
+          </h2>
+          <p className="text-center text-muted-foreground mb-12 text-lg">
+            Всё необходимое для незабываемого оффроуд приключения
+          </p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {services.map((service, index) => (
+              <Card 
+                key={index}
+                className="bg-card border-border hover:border-secondary transition-all hover:scale-105 animate-slide-in-left"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CardContent className="p-6 text-center">
+                  <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon name={service.icon as any} size={32} className="text-secondary" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">{service.title}</h3>
+                  <p className="text-muted-foreground text-sm">{service.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="gallery" className="py-20 bg-card">
+        <div className="container mx-auto px-4">
+          <h2 className="text-5xl font-bold text-center mb-4 text-accent animate-fade-in">
+            ГАЛЕРЕЯ
+          </h2>
+          <p className="text-center text-muted-foreground mb-12 text-lg">
+            Моменты настоящего экстрима
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {gallery.map((item, index) => (
+              <div 
+                key={index}
+                className="group relative overflow-hidden rounded-lg aspect-square cursor-pointer animate-scale-in"
+                style={{ animationDelay: `${index * 0.15}s` }}
+              >
+                <img 
+                  src={item.image} 
+                  alt={item.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                  <h3 className="text-2xl font-bold p-6 text-accent">{item.title}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="community" className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-background to-primary/10"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-3xl mx-auto text-center animate-fade-in">
+            <Icon name="Users" size={80} className="mx-auto mb-6 text-primary" />
+            <h2 className="text-5xl font-bold mb-4 text-primary">
+              ПРИСОЕДИНЯЙСЯ К СООБЩЕСТВУ
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8">
+              Более 5000 оффроудеров уже делятся опытом, организуют совместные поездки и покоряют новые маршруты вместе
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="text-lg hover:scale-105 transition-transform">
+                <Icon name="MessageCircle" size={20} className="mr-2" />
+                Чат сообщества
+              </Button>
+              <Button size="lg" variant="outline" className="text-lg hover:scale-105 transition-transform">
+                <Icon name="Calendar" size={20} className="mr-2" />
+                События
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contacts" className="py-20 bg-card">
+        <div className="container mx-auto px-4">
+          <h2 className="text-5xl font-bold text-center mb-4 animate-fade-in">
+            КОНТАКТЫ
+          </h2>
+          <p className="text-center text-muted-foreground mb-12 text-lg">
+            Свяжись с нами и начни своё приключение
+          </p>
+          
+          <div className="max-w-2xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              <div className="animate-scale-in">
+                <Icon name="Phone" size={40} className="mx-auto mb-3 text-primary" />
+                <h3 className="font-bold mb-2">Телефон</h3>
+                <p className="text-muted-foreground">+7 (999) 123-45-67</p>
+              </div>
+              <div className="animate-scale-in" style={{ animationDelay: '0.1s' }}>
+                <Icon name="Mail" size={40} className="mx-auto mb-3 text-secondary" />
+                <h3 className="font-bold mb-2">Email</h3>
+                <p className="text-muted-foreground">info@offroad.ru</p>
+              </div>
+              <div className="animate-scale-in" style={{ animationDelay: '0.2s' }}>
+                <Icon name="MapPin" size={40} className="mx-auto mb-3 text-accent" />
+                <h3 className="font-bold mb-2">Адрес</h3>
+                <p className="text-muted-foreground">Москва, ул. Экстрима, 1</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-background border-t border-border py-8">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Icon name="Mountain" size={24} className="text-primary" />
+            <span className="text-xl font-bold">OFFROAD</span>
+          </div>
+          <p className="text-muted-foreground text-sm">
+            © 2024 OFFROAD. Покоряй бездорожье с нами!
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
