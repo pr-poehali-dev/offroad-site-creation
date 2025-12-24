@@ -1,13 +1,42 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [eventsDialogOpen, setEventsDialogOpen] = useState(false);
+  const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<typeof events[0] | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    experience: '',
+    vehicle: '',
+  });
+  const { toast } = useToast();
+
+  const handleRegister = (event: typeof events[0]) => {
+    setSelectedEvent(event);
+    setRegistrationDialogOpen(true);
+  };
+
+  const handleSubmitRegistration = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast({
+      title: 'Заявка отправлена!',
+      description: `Вы записались на "${selectedEvent?.title}". Мы свяжемся с вами в ближайшее время!`,
+    });
+    setRegistrationDialogOpen(false);
+    setFormData({ name: '', phone: '', email: '', experience: '', vehicle: '' });
+  };
 
   const events = [
     { 
@@ -324,6 +353,116 @@ const Index = () => {
         </div>
       </section>
 
+      <Dialog open={registrationDialogOpen} onOpenChange={setRegistrationDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+              <Icon name="UserPlus" size={28} />
+              РЕГИСТРАЦИЯ НА ВЫЕЗД
+            </DialogTitle>
+            <DialogDescription className="text-base mt-2">
+              {selectedEvent?.title} • {selectedEvent && formatDate(selectedEvent.date)}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmitRegistration} className="space-y-4 mt-4">
+            <div>
+              <Label htmlFor="name" className="text-sm font-bold uppercase">
+                Ваше имя *
+              </Label>
+              <Input
+                id="name"
+                placeholder="Иван Иванов"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phone" className="text-sm font-bold uppercase">
+                Телефон *
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+7 (999) 123-45-67"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                required
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email" className="text-sm font-bold uppercase">
+                Email *
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="ivan@example.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="vehicle" className="text-sm font-bold uppercase">
+                Ваш автомобиль
+              </Label>
+              <Input
+                id="vehicle"
+                placeholder="Toyota Land Cruiser 200"
+                value={formData.vehicle}
+                onChange={(e) => setFormData({ ...formData, vehicle: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="experience" className="text-sm font-bold uppercase">
+                Опыт оффроуда
+              </Label>
+              <Textarea
+                id="experience"
+                placeholder="Расскажите о своем опыте в оффроуде: какие маршруты проходили, сколько лет занимаетесь..."
+                value={formData.experience}
+                onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                className="mt-1 min-h-[80px]"
+              />
+            </div>
+
+            <div className="bg-muted p-4 rounded-lg">
+              <div className="flex items-start gap-2">
+                <Icon name="Info" size={16} className="text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-muted-foreground">
+                  После отправки заявки наш координатор свяжется с вами для подтверждения участия и обсуждения деталей маршрута.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <Button type="submit" className="flex-1 hover:scale-105 transition-transform">
+                <Icon name="Send" size={16} className="mr-2" />
+                Отправить заявку
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setRegistrationDialogOpen(false)}
+                className="hover:scale-105 transition-transform"
+              >
+                Отмена
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={eventsDialogOpen} onOpenChange={setEventsDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -380,7 +519,10 @@ const Index = () => {
                         </div>
                       </div>
                     </div>
-                    <Button className="hover:scale-105 transition-transform">
+                    <Button 
+                      className="hover:scale-105 transition-transform"
+                      onClick={() => handleRegister(event)}
+                    >
                       <Icon name="UserPlus" size={16} className="mr-2" />
                       Записаться
                     </Button>
