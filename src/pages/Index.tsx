@@ -1,10 +1,66 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
+  const [eventsDialogOpen, setEventsDialogOpen] = useState(false);
+
+  const events = [
+    { 
+      id: 1, 
+      date: '2025-01-15', 
+      title: 'Экспедиция в Карелию', 
+      location: 'Карелия - Вуоксинские пороги',
+      difficulty: 'Средний',
+      participants: 12,
+      status: 'Открыта регистрация'
+    },
+    { 
+      id: 2, 
+      date: '2025-01-22', 
+      title: 'Покорение Алтая', 
+      location: 'Алтай - Чуйский тракт',
+      difficulty: 'Экстрим',
+      participants: 8,
+      status: 'Осталось 2 места'
+    },
+    { 
+      id: 3, 
+      date: '2025-02-05', 
+      title: 'Зимний Урал', 
+      location: 'Урал - Таганай',
+      difficulty: 'Экстрим',
+      participants: 15,
+      status: 'Открыта регистрация'
+    },
+    { 
+      id: 4, 
+      date: '2025-02-18', 
+      title: 'Кавказские высоты', 
+      location: 'Кавказ - Эльбрус',
+      difficulty: 'Хардкор',
+      participants: 6,
+      status: 'Требуется опыт'
+    },
+    { 
+      id: 5, 
+      date: '2025-03-10', 
+      title: 'Весенний прорыв', 
+      location: 'Алтай - Чуйский тракт',
+      difficulty: 'Экстрим',
+      participants: 10,
+      status: 'Скоро старт'
+    },
+  ];
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
 
   const routes = [
     { id: 1, name: 'Алтай - Чуйский тракт', difficulty: 'Экстрим', lat: 50.4, lng: 86.9, description: 'Легендарный маршрут с невероятными видами' },
@@ -223,7 +279,12 @@ const Index = () => {
                 <Icon name="MessageCircle" size={20} className="mr-2" />
                 Чат сообщества
               </Button>
-              <Button size="lg" variant="outline" className="text-lg hover:scale-105 transition-transform">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg hover:scale-105 transition-transform"
+                onClick={() => setEventsDialogOpen(true)}
+              >
                 <Icon name="Calendar" size={20} className="mr-2" />
                 События
               </Button>
@@ -262,6 +323,86 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <Dialog open={eventsDialogOpen} onOpenChange={setEventsDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-bold text-primary flex items-center gap-3">
+              <Icon name="Calendar" size={32} />
+              ЗАПЛАНИРОВАННЫЕ ВЫЕЗДЫ
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-6">
+            {events.map((event, index) => (
+              <Card 
+                key={event.id} 
+                className="bg-card border-border hover:border-primary transition-all animate-fade-in"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-16 h-16 bg-primary/20 rounded-lg flex flex-col items-center justify-center flex-shrink-0">
+                          <span className="text-2xl font-bold text-primary">
+                            {new Date(event.date).getDate()}
+                          </span>
+                          <span className="text-xs text-primary uppercase">
+                            {new Date(event.date).toLocaleDateString('ru-RU', { month: 'short' })}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold mb-1">{event.title}</h3>
+                          <div className="flex items-center gap-2 text-muted-foreground text-sm mb-2">
+                            <Icon name="MapPin" size={14} />
+                            <span>{event.location}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge 
+                              variant="outline" 
+                              className={`${
+                                event.difficulty === 'Хардкор' ? 'border-destructive text-destructive' :
+                                event.difficulty === 'Экстрим' ? 'border-primary text-primary' :
+                                'border-secondary text-secondary'
+                              }`}
+                            >
+                              {event.difficulty}
+                            </Badge>
+                            <Badge variant="outline" className="border-accent text-accent">
+                              <Icon name="Users" size={12} className="mr-1" />
+                              {event.participants} участников
+                            </Badge>
+                            <Badge variant="default" className="bg-primary/20 text-primary border-primary">
+                              {event.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <Button className="hover:scale-105 transition-transform">
+                      <Icon name="UserPlus" size={16} className="mr-2" />
+                      Записаться
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-6 p-6 bg-muted rounded-lg">
+            <div className="flex items-start gap-4">
+              <Icon name="Info" size={24} className="text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h4 className="font-bold mb-2">Как присоединиться к выезду?</h4>
+                <p className="text-sm text-muted-foreground">
+                  Нажмите кнопку "Записаться" на интересующем событии. Наш координатор свяжется с вами в течение 24 часов для подтверждения участия и обсуждения деталей маршрута.
+                </p>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <footer className="bg-background border-t border-border py-8">
         <div className="container mx-auto px-4 text-center">
