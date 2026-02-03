@@ -22,6 +22,13 @@ const Admin = () => {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
+  const [stats, setStats] = useState({
+    total: 0,
+    new: 0,
+    confirmed: 0,
+    cancelled: 0,
+    popularEvents: [] as { title: string; count: number }[]
+  });
   const { toast } = useToast();
 
   const fetchRegistrations = async () => {
@@ -33,7 +40,27 @@ const Admin = () => {
       
       const response = await fetch(url);
       const data = await response.json();
-      setRegistrations(data.registrations || []);
+      const regs = data.registrations || [];
+      setRegistrations(regs);
+      
+      // Подсчитываем статистику
+      const total = regs.length;
+      const newCount = regs.filter((r: Registration) => r.status === 'new').length;
+      const confirmed = regs.filter((r: Registration) => r.status === 'confirmed').length;
+      const cancelled = regs.filter((r: Registration) => r.status === 'cancelled').length;
+      
+      // Популярные маршруты
+      const eventCounts = regs.reduce((acc: any, reg: Registration) => {
+        acc[reg.event_title] = (acc[reg.event_title] || 0) + 1;
+        return acc;
+      }, {});
+      
+      const popularEvents = Object.entries(eventCounts)
+        .map(([title, count]) => ({ title, count: count as number }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 3);
+      
+      setStats({ total, new: newCount, confirmed, cancelled, popularEvents });
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -97,6 +124,82 @@ const Admin = () => {
           </div>
         </div>
       </header>
+
+      {/* Statistics */}
+      <div className="bg-background border-b">
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Всего заявок</p>
+                    <p className="text-3xl font-bold text-primary">{stats.total}</p>
+                  </div>
+                  <Icon name="Users" size={32} className="text-primary/20" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Новые</p>
+                    <p className="text-3xl font-bold text-blue-500">{stats.new}</p>
+                  </div>
+                  <Icon name="Bell" size={32} className="text-blue-500/20" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Подтверждено</p>
+                    <p className="text-3xl font-bold text-green-500">{stats.confirmed}</p>
+                  </div>
+                  <Icon name="CheckCircle" size={32} className="text-green-500/20" />
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Отменено</p>
+                    <p className="text-3xl font-bold text-red-500">{stats.cancelled}</p>
+                  </div>
+                  <Icon name="XCircle" size={32} className="text-red-500/20" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {stats.popularEvents.length > 0 && (
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Icon name="TrendingUp" size={20} />
+                  Популярные маршруты
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {stats.popularEvents.map((event, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 rounded bg-muted">
+                      <span className="font-medium">{event.title}</span>
+                      <Badge>{event.count} заявок</Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
 
       {/* Filters */}
       <div className="container mx-auto px-4 py-6">

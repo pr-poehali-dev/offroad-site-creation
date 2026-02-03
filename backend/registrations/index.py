@@ -3,6 +3,7 @@ import os
 import psycopg2
 from datetime import datetime
 from typing import Optional
+from email_service import send_registration_notification
 
 def handler(event: dict, context) -> dict:
     """API для работы с заявками на выезды: создание и получение списка"""
@@ -49,6 +50,12 @@ def handler(event: dict, context) -> dict:
                 
                 row = cur.fetchone()
                 conn.commit()
+                
+                # Отправляем email-уведомление координатору
+                try:
+                    send_registration_notification(body)
+                except Exception as e:
+                    print(f"Ошибка отправки email: {e}")
                 
                 return {
                     'statusCode': 201,

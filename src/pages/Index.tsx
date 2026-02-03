@@ -15,6 +15,7 @@ const Index = () => {
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<typeof events[0] | null>(null);
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -184,8 +185,10 @@ const Index = () => {
             <Icon name="Mountain" size={32} className="text-primary" />
             <span className="text-2xl font-bold">OFFROAD</span>
           </div>
+          
+          {/* Desktop Menu */}
           <div className="hidden md:flex gap-6">
-            {['home', 'routes', 'services', 'gallery', 'community', 'contacts'].map((section) => (
+            {['home', 'routes', 'services', 'gallery', 'reviews', 'community', 'contacts'].map((section) => (
               <button
                 key={section}
                 onClick={() => scrollToSection(section)}
@@ -197,12 +200,51 @@ const Index = () => {
                 {section === 'routes' && 'Маршруты'}
                 {section === 'services' && 'Услуги'}
                 {section === 'gallery' && 'Галерея'}
+                {section === 'reviews' && 'Отзывы'}
                 {section === 'community' && 'Сообщество'}
                 {section === 'contacts' && 'Контакты'}
               </button>
             ))}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden p-2 hover:bg-accent/10 rounded-lg transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-border bg-background/98 backdrop-blur-sm">
+            <div className="container mx-auto px-4 py-4 space-y-2">
+              {['home', 'routes', 'services', 'gallery', 'reviews', 'community', 'contacts'].map((section) => (
+                <button
+                  key={section}
+                  onClick={() => {
+                    scrollToSection(section);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm uppercase tracking-wider transition-colors ${
+                    activeSection === section 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'hover:bg-accent/10 text-foreground/70'
+                  }`}
+                >
+                  {section === 'home' && 'Главная'}
+                  {section === 'routes' && 'Маршруты'}
+                  {section === 'services' && 'Услуги'}
+                  {section === 'gallery' && 'Галерея'}
+                  {section === 'reviews' && 'Отзывы'}
+                  {section === 'community' && 'Сообщество'}
+                  {section === 'contacts' && 'Контакты'}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
@@ -404,6 +446,85 @@ const Index = () => {
                 События
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reviews" className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <h2 className="text-5xl font-bold text-center mb-4 text-primary animate-fade-in">
+            ОТЗЫВЫ УЧАСТНИКОВ
+          </h2>
+          <p className="text-center text-muted-foreground mb-12 text-lg">
+            Что говорят о нас настоящие оффроудеры
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="hover:shadow-xl transition-shadow animate-scale-in">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Icon name="User" size={24} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">Алексей П.</h3>
+                    <div className="flex gap-1">
+                      {[1,2,3,4,5].map((star) => (
+                        <Icon key={star} name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  "Прошел маршрут по Алтаю — незабываемые эмоции! Организация на высшем уровне, гиды профессионалы. Обязательно вернусь ещё!"
+                </p>
+                <Badge className="mt-4" variant="outline">Алтай 2025</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-xl transition-shadow animate-scale-in" style={{ animationDelay: '0.1s' }}>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center">
+                    <Icon name="User" size={24} className="text-secondary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">Марина С.</h3>
+                    <div className="flex gap-1">
+                      {[1,2,3,4,5].map((star) => (
+                        <Icon key={star} name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  "Первый раз поехала в оффроуд и не пожалела! Команда помогла освоиться, всё объяснили и показали. Атмосфера дружеская, чувствуешь себя частью команды!"
+                </p>
+                <Badge className="mt-4" variant="outline">Карелия 2024</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-xl transition-shadow animate-scale-in" style={{ animationDelay: '0.2s' }}>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
+                    <Icon name="User" size={24} className="text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">Дмитрий К.</h3>
+                    <div className="flex gap-1">
+                      {[1,2,3,4,5].map((star) => (
+                        <Icon key={star} name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  "Экстрим на Кавказе — испытание для настоящих мужчин! Техника была на высоте, маршрут продуман до мелочей. Огромное спасибо клубу!"
+                </p>
+                <Badge className="mt-4" variant="outline">Кавказ 2025</Badge>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
