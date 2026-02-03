@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "name": "Create new registration",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "event_title": "Долина Вулканов",
+        "event_date": "2026-03-15",
+        "name": "Иван Иванов",
+        "phone": "+7 (999) 123-45-67",
+        "email": "ivan@example.com",
+        "vehicle": "Toyota Land Cruiser 200",
+        "experience": "3 года офроуда, проходил маршруты средней сложности"
+      },
+      "expectedStatus": 201,
+      "skipBodyValidation": true
+    },
+    {
+      "name": "Get all registrations",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "skipBodyValidation": true
+    }
+  ]
+}

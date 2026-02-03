@@ -14,6 +14,7 @@ const Index = () => {
   const [eventsDialogOpen, setEventsDialogOpen] = useState(false);
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<typeof events[0] | null>(null);
+  const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -28,14 +29,45 @@ const Index = () => {
     setRegistrationDialogOpen(true);
   };
 
-  const handleSubmitRegistration = (e: React.FormEvent) => {
+  const handleSubmitRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: 'Заявка отправлена!',
-      description: `Вы записались на "${selectedEvent?.title}". Мы свяжемся с вами в ближайшее время!`,
-    });
-    setRegistrationDialogOpen(false);
-    setFormData({ name: '', phone: '', email: '', experience: '', vehicle: '' });
+    
+    if (!selectedEvent) return;
+    
+    try {
+      const response = await fetch('https://functions.poehali.dev/4abcc351-37f6-4a3a-b6c4-f7d2560a6b3a', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_title: selectedEvent.title,
+          event_date: selectedEvent.date,
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          vehicle: formData.vehicle,
+          experience: formData.experience,
+        }),
+      });
+      
+      if (response.ok) {
+        toast({
+          title: 'Заявка отправлена!',
+          description: `Вы записались на "${selectedEvent.title}". Мы свяжемся с вами в ближайшее время!`,
+        });
+        setRegistrationDialogOpen(false);
+        setFormData({ name: '', phone: '', email: '', experience: '', vehicle: '' });
+      } else {
+        throw new Error('Ошибка отправки');
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось отправить заявку. Попробуйте еще раз.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const events = [
@@ -107,16 +139,34 @@ const Index = () => {
 
   const gallery = [
     { 
+      image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/a4ff083e-a3f0-4bdd-839c-45af4bb26e0c.jpg',
+      title: 'Горные тропы',
+      description: 'Преодоление каменистых перевалов'
+    },
+    { 
+      image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/0dcdf5d9-bde4-4cbf-b6f3-afeb3cfbd1a4.jpg',
+      title: 'Водные переправы',
+      description: 'Групповое прохождение рек'
+    },
+    { 
+      image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/ecde2a3f-d761-44d9-ac9a-cfa3e4c105b1.jpg',
+      title: 'Пустынные дюны',
+      description: 'Покорение песчаных барханов'
+    },
+    { 
       image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/75cb4627-a062-4329-94b5-79b2366e1dce.jpg',
-      title: 'Пустынные дюны'
+      title: 'Экстремальные подъёмы',
+      description: 'Техника прохождения крутых склонов'
     },
     { 
       image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/b24202f7-193a-48e8-922d-ebb56d4b7e1b.jpg',
-      title: 'Грязевые ванны'
+      title: 'Грязевые ванны',
+      description: 'Испытание техники в болотах'
     },
     { 
       image: 'https://cdn.poehali.dev/projects/3ad7b360-5482-4ac3-bc58-bb950bf4ef60/files/6f0d8afd-df57-41a8-97e6-8421a76616b2.jpg',
-      title: 'Горные тропы'
+      title: 'Ночные выезды',
+      description: 'Приключения под звёздами'
     },
   ];
 
@@ -191,12 +241,47 @@ const Index = () => {
           <h2 className="text-5xl font-bold text-center mb-4 text-primary animate-fade-in">
             ПОПУЛЯРНЫЕ МАРШРУТЫ
           </h2>
-          <p className="text-center text-muted-foreground mb-12 text-lg">
+          <p className="text-center text-muted-foreground mb-8 text-lg">
             Интерактивная карта с проверенными местами для экстремальных поездок
           </p>
+
+          <div className="flex gap-3 justify-center mb-8 flex-wrap">
+            <Button 
+              variant={difficultyFilter === 'all' ? 'default' : 'outline'}
+              onClick={() => setDifficultyFilter('all')}
+              className="hover:scale-105 transition-transform"
+            >
+              <Icon name="Map" size={16} className="mr-2" />
+              Все маршруты
+            </Button>
+            <Button 
+              variant={difficultyFilter === 'Средний' ? 'default' : 'outline'}
+              onClick={() => setDifficultyFilter('Средний')}
+              className="hover:scale-105 transition-transform"
+            >
+              <Icon name="TrendingUp" size={16} className="mr-2" />
+              Средний
+            </Button>
+            <Button 
+              variant={difficultyFilter === 'Экстрим' ? 'default' : 'outline'}
+              onClick={() => setDifficultyFilter('Экстрим')}
+              className="hover:scale-105 transition-transform"
+            >
+              <Icon name="Zap" size={16} className="mr-2" />
+              Экстрим
+            </Button>
+            <Button 
+              variant={difficultyFilter === 'Хардкор' ? 'default' : 'outline'}
+              onClick={() => setDifficultyFilter('Хардкор')}
+              className="hover:scale-105 transition-transform"
+            >
+              <Icon name="Flame" size={16} className="mr-2" />
+              Хардкор
+            </Button>
+          </div>
           
           <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {routes.map((route, index) => (
+            {routes.filter(route => difficultyFilter === 'all' || route.difficulty === difficultyFilter).map((route, index) => (
               <Card 
                 key={route.id} 
                 className="bg-background border-border hover:border-primary transition-all cursor-pointer hover:scale-105 animate-scale-in"
@@ -283,8 +368,9 @@ const Index = () => {
                   alt={item.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <h3 className="text-2xl font-bold p-6 text-accent">{item.title}</h3>
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                  <h3 className="text-2xl font-bold text-accent mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.description}</p>
                 </div>
               </div>
             ))}
